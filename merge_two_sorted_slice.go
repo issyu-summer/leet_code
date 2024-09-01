@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -11,6 +12,7 @@ func main() {
 }
 
 func merge(nums1 []int, m int, nums2 []int, n int) {
+	context.Background()
 	i, j, tail := m-1, n-1, m+n-1
 	for {
 		if i == -1 {
