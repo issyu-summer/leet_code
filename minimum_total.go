@@ -16,11 +16,10 @@ func minimumTotal(triangle [][]int) int {
 	ans[0][0] = triangle[0][0]
 	for i := 1; i < len(triangle); i++ {
 		for j := 1; j < len(triangle[i]); j++ {
-			ans[i][j] = ans[i-1][j]min(ans[i][j], triangle[i][j])
+			ans[i][j] = ans[i-1][j] + minVal(ans[i][j], triangle[i][j])
 		}
-		ans[i] = ans[i-1] + minVal(triangle[i][i], triangle[i][i-1])
 	}
-	return ans[len(triangle)-1]
+	return ans[len(triangle)-1][len(triangle[len(triangle)-1])-1]
 }
 
 func minVal(arr ...int) int {

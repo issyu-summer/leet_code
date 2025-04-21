@@ -10,28 +10,24 @@ type ListNode struct {
 }
 
 func hasCycle(head *ListNode) bool {
-	lMap := map[*ListNode]bool{}
-	for head != nil {
-		if _, ok := lMap[head]; ok {
+	cnt := map[*ListNode]struct{}{}
+	for cur := head; cur != nil; cur = cur.Next {
+		if _, ok := cnt[cur]; ok {
 			return true
 		}
-		lMap[head] = true
-		head = head.Next
+		cnt[cur] = struct{}{}
 	}
 	return false
 }
 
-func hasCycle1(head *ListNode) bool {
-	if head == nil || head.Next == nil {
-		return false
-	}
-	slow, fast := head, head.Next
-	for fast != slow {
-		if fast == nil || fast.Next == nil {
-			return false
-		}
+func floyd(head *ListNode) bool {
+	slow, fast := head, head
+	for fast != nil && fast.Next != nil {
 		slow = slow.Next
 		fast = fast.Next.Next
+		if slow == fast {
+			return true
+		}
 	}
-	return true
+	return false
 }

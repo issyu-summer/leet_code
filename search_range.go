@@ -32,17 +32,3 @@ func searchRange(nums []int, target int) []int {
 	}
 	return []int{-1, -1}
 }
-
-func binarySearch(nums []int, target int, lower bool) int {
-	l, r, idx := 0, len(nums)-1, len(nums)
-	for l <= r {
-		mid := l + (r-l)>>1
-		if nums[mid] > target || (lower && nums[mid] >= target) {
-			r = mid - 1
-			idx = mid
-		} else {
-			l = mid + 1
-		}
-	}
-	return idx
-}

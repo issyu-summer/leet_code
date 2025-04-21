@@ -7,21 +7,21 @@ func main() {
 }
 
 func wordPattern(pattern string, s string) bool {
-	pMap := make(map[byte]string)
-	sMap := make(map[string]byte)
-	strArr := strings.Split(s, " ")
-	if len(pattern) != len(strArr) {
+	arr := strings.Split(s, " ")
+	if len(arr) != len(pattern) {
 		return false
 	}
-	for i := 0; i < len(strArr); i++ {
-		if v, ok := pMap[pattern[i]]; ok && v != strArr[i] {
+	pMap := make(map[byte]string)
+	sMap := make(map[string]byte)
+	for i, str := range arr {
+		if targetStr, ok := pMap[pattern[i]]; ok && str != targetStr {
 			return false
 		}
-		if v, ok := sMap[strArr[i]]; ok && v != pattern[i] {
+		if targetByte, ok := sMap[str]; ok && targetByte != pattern[i] {
 			return false
 		}
-		pMap[pattern[i]] = strArr[i]
-		sMap[strArr[i]] = pattern[i]
+		pMap[pattern[i]] = str
+		sMap[str] = pattern[i]
 	}
 	return true
 }

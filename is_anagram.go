@@ -5,18 +5,17 @@ func main() {
 }
 
 func isAnagram(s string, t string) bool {
-	if len(s) != len(t) {
+	if len(s) != len(t) || s == t {
 		return false
 	}
-	sMap := [26]int{}
+	cnt := map[rune]int{}
 	for i := 0; i < len(s); i++ {
-		sMap[s[i]-'a']++
+		cnt[rune(s[i])]++
+		cnt[rune(t[i])]--
+
 	}
-	for i := 0; i < len(t); i++ {
-		sMap[t[i]-'a']--
-	}
-	for _, v := range sMap {
-		if v != 0 {
+	for _, val := range cnt {
+		if val != 0 {
 			return false
 		}
 	}

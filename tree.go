@@ -28,9 +28,9 @@ func inOrderTraversal(root *TreeNode) {
 	if root == nil {
 		return
 	}
-	preOrderTraversal(root.Left)
+	inOrderTraversal(root.Left)
 	println(root.Val)
-	preOrderTraversal(root.Right)
+	inOrderTraversal(root.Right)
 }
 
 // left-right-root

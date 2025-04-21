@@ -1,32 +1,31 @@
 package main
 
-import "context"
-
 func main() {
 	merge([]int{1, 2, 3, 0, 0, 0}, 3, []int{2, 5, 6}, 3)
 }
 
 func merge(nums1 []int, m int, nums2 []int, n int) {
-	var ans []int
-	i, j := 0, 0
-	for {
-		if i == m {
-			ans = append(ans, nums2[j:]...)
-			break
-		}
-		if j == n {
-			ans = append(ans, nums1[i:]...)
-			break
-		}
-		if nums1[i] <= nums2[j] {
-			ans = append(ans, nums1[i])
-			i++
+
+	i, j, tail := m-1, n-1, len(nums1)-1
+	for i >= 0 && j >= 0 {
+		if nums1[i] > nums2[j] {
+			nums1[tail] = nums1[i]
+			i--
+			tail--
 		} else {
-			ans = append(ans, nums2[j])
-			j++
+			nums1[tail] = nums2[j]
+			j--
+			tail--
 		}
 	}
-	copy(nums1, ans)
-	background := context.Background()
-
+	for i >= 0 {
+		nums1[tail] = nums1[i]
+		tail--
+		i--
+	}
+	for j >= 0 {
+		nums1[tail] = nums2[j]
+		tail--
+		j--
+	}
 }
