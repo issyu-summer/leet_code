@@ -73,7 +73,6 @@ func quickSortInPlace(nums []int, low, high int) {
 		pi := partition(nums, low, high)
 		quickSortInPlace(nums, low, pi-1)
 		quickSortInPlace(nums, pi+1, high)
-
 	}
 }
 

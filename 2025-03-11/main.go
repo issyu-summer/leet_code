@@ -79,12 +79,9 @@ func removeElements(head *ListNode, val int) *ListNode {
 func minSubArrayLen(target int, nums []int) int {
 	res := math.MaxInt
 	sum := 0
-	check := func() bool {
-		return sum >= target
-	}
 	for l, r := 0, 0; r < len(nums); r++ {
 		sum += nums[r]
-		for l <= r && check() {
+		for l <= r && sum >= target {
 			sum -= nums[l]
 			l++
 			if sum == target && res > r-l+1 {
