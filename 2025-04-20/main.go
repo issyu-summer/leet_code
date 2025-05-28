@@ -9,7 +9,10 @@ import (
 )
 
 func main() {
-	fmt.Println(threeSum([]int{-1, 0, 1, 2, -1, -4}))
+	//fmt.Println(threeSum([]int{-1, 0, 1, 2, -1, -4}))
+	nums := []int{1, 3, 8, 5, 1, 9, 8}
+	quickSort(nums, 0, 6)
+	fmt.Println(nums)
 }
 
 // codetop *4
@@ -172,18 +175,29 @@ func (h *Ints) Pop() any {
 // 4.快速排序
 func partition(nums []int, l, r int) int {
 	//随机基准
+	if r == 6 {
+		fmt.Println(nums)
+	}
 	randIdx := l + rand.IntN(r-l+1)
 	nums[r], nums[randIdx] = nums[randIdx], nums[r]
 	//分区
 	pivot := nums[r]
+	if r == 6 {
+		fmt.Println(nums, pivot)
+	}
 	i := l
 	for j := l; j < r; j++ {
 		if nums[j] <= pivot {
 			nums[i], nums[j] = nums[j], nums[i]
 			i++
 		}
+		if r == 6 {
+			fmt.Println(nums, pivot)
+		}
 	}
+	//i是第pivot的插入位置，比i小的idx的元素，都小于pivot
 	nums[i], nums[r] = nums[r], nums[i]
+	fmt.Println(nums, pivot)
 	return i
 }
 

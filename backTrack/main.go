@@ -50,27 +50,6 @@ type TreeNode struct {
 	Right *TreeNode
 }
 
-// 树型回溯
-// 113.路径总和
-func pathSum(root *TreeNode, target int) [][]int {
-	var res [][]int
-	var fc func(root *TreeNode, target int, path []int)
-	fc = func(root *TreeNode, target int, path []int) {
-		if root == nil {
-			return
-		}
-		path = append(path, root.Val)
-		if root.Left == nil && root.Right == nil && target == root.Val {
-			res = append(res, append([]int{}, path...))
-			return
-		}
-		fc(root.Left, target-root.Val, path)
-		fc(root.Right, target-root.Val, path)
-	}
-	fc(root, target, []int{})
-	return res
-}
-
 func slice[T cmp.Ordered](s []T) []T {
 	return s
 }
@@ -119,30 +98,30 @@ func backTrackFc[T cmp.Ordered](checkFc func(path []T) (bool, bool), arr []T, co
 // 数组型回溯
 // 46.全排列，无重复
 func permute(nums []int) [][]int {
-	check := func(nums []int) func(path []int) (bool, bool) {
-		return func(path []int) (bool, bool) {
-			return false, len(path) == len(nums)
-		}
-	}
-	res := backTrackFc(check(nums), nums, false)
-	return res
-	//var res [][]int
-	//var fc func([]int, uint64)
-	//fc = func(path []int, used uint64) {
-	//	if len(path) == len(nums) {
-	//		res = append(res, append([]int{}, path...))
-	//		return
-	//	}
-	//	for i := 0; i < len(nums); i++ {
-	//		mask := uint64(1 << i)
-	//		if used&mask != 0 {
-	//			continue
-	//		}
-	//		fc(append(path, nums[i]), used|mask)
+	//check := func(nums []int) func(path []int) (bool, bool) {
+	//	return func(path []int) (bool, bool) {
+	//		return false, len(path) == len(nums)
 	//	}
 	//}
-	//fc([]int{}, 0)
+	//res := backTrackFc(check(nums), nums, false)
 	//return res
+	var res [][]int
+	var fc func([]int, uint64)
+	fc = func(path []int, used uint64) {
+		if len(path) == len(nums) {
+			res = append(res, append([]int{}, path...))
+			return
+		}
+		for i := 0; i < len(nums); i++ {
+			mask := uint64(1 << i)
+			if used&mask != 0 {
+				continue
+			}
+			fc(append(path, nums[i]), used|mask)
+		}
+	}
+	fc([]int{}, 0)
+	return res
 }
 
 // 全排列II，有重复
@@ -312,5 +291,22 @@ func generateParenthesis(n int) []string {
 		}
 	}
 	fc([]byte{}, 0, 0)
+	return res
+}
+
+func pathSum(root *TreeNode, target int) [][]int {
+	var res [][]int
+	var backTrack func(root *TreeNode, path []int, target int)
+	backTrack = func(root *TreeNode, path []int, target int) {
+		if root == nil {
+			return
+		}
+		if root.Left == nil && root.Right == nil && root.Val == target {
+			res = append(res, append([]int{}, append(path, root.Val)...))
+		}
+		backTrack(root.Left, append(path, root.Val), target-root.Val)
+		backTrack(root.Right, append(path, root.Val), target-root.Val)
+	}
+	backTrack(root, []int{}, target)
 	return res
 }
