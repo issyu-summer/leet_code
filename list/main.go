@@ -324,6 +324,7 @@ func sortList(head *ListNode) *ListNode {
 	return mergeHelper(l1, l2)
 }
 
+// 获取交点
 func getIntersectionNode(headA, headB *ListNode) *ListNode {
 	a, b := headA, headB
 	for a != b {
@@ -341,6 +342,7 @@ func getIntersectionNode(headA, headB *ListNode) *ListNode {
 	return a
 }
 
+// 移除元素
 func removeElements(head *ListNode, val int) *ListNode {
 	dummy := &ListNode{Next: head}
 	pre := dummy

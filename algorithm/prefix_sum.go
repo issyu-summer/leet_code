@@ -99,26 +99,21 @@ func pathSumII(root *TreeNode, target int) [][]int {
 }
 
 func pathSumIII(root *TreeNode, target int) int {
-	var res [][]int
+	var res int
 	var backTrack func(*TreeNode, []int, int)
-	var prefix = map[int][]int{0: {-1}}
+	var prefix = map[int]int{0: 1}
 	backTrack = func(root *TreeNode, path []int, sum int) {
 		if root == nil {
 			return
 		}
 		path = append(path, root.Val)
 		sum += root.Val
-		if idxList, ok := prefix[sum-target]; ok {
-			for _, start := range idxList {
-				res = append(res, append([]int{}, path[start+1:]...))
-				fmt.Println(path[start+1:])
-			}
-		}
-		prefix[sum] = append(prefix[sum], len(path)-1)
+		res += prefix[sum-target]
+		prefix[sum]++
 		backTrack(root.Left, path, sum)
 		backTrack(root.Right, path, sum)
-		prefix[sum] = prefix[sum][:len(prefix[sum])-1]
+		prefix[sum]--
 	}
 	backTrack(root, []int{}, 0)
-	return len(res)
+	return res
 }

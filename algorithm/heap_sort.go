@@ -18,6 +18,7 @@ func heapSort(nums []int) {
 		heapify(nums, n, i)
 	}
 	fmt.Println(n/2-1, nums)
+	//大的放后面（）大根堆升序
 	for i := n - 1; i > 0; i-- {
 		nums[0], nums[i] = nums[i], nums[0]
 		heapify(nums, i, 0)
