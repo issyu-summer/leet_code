@@ -2,12 +2,6 @@ package main
 
 import "math"
 
-type TreeNode struct {
-	Val   int
-	Left  *TreeNode
-	Right *TreeNode
-}
-
 func main() {
 	root := &TreeNode{Val: 5}
 	root.Left = &TreeNode{Val: 1}

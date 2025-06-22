@@ -171,6 +171,9 @@ func reverseHelper(head, end *ListNode) *ListNode {
 
 // k个一组反转链表
 func reverseKGroup(head *ListNode, k int) *ListNode {
+	if head == nil || head.Next == nil {
+		return head
+	}
 	end := head
 	for i := 0; i < k; i++ {
 		if end == nil {

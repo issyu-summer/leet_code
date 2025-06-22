@@ -202,3 +202,32 @@ func pathSum(root *TreeNode, target int) [][]int {
 	backTrack(root, []int{}, target)
 	return res
 }
+
+func partition(s string) [][]string {
+	ok := func(s string) bool {
+		l, r := 0, len(s)-1
+		for l < r {
+			if s[l] != s[r] {
+				return false
+			}
+			l++
+			r--
+		}
+		return true
+	}
+	var res [][]string
+	var backTrack func(path []string, start int)
+	backTrack = func(path []string, start int) {
+		if start == len(s) {
+			res = append(res, append([]string{}, path...))
+			return
+		}
+		for i := start; i < len(s); i++ {
+			if ok(s[start : i+1]) {
+				backTrack(append(path, s[start:i+1]), i+1)
+			}
+		}
+	}
+	backTrack([]string{}, 0)
+	return res
+}

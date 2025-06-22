@@ -38,10 +38,3 @@ func dp(nums []int) int {
 	}
 	return f[len(nums)-1]
 }
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
