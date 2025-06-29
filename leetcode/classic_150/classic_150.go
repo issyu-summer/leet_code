@@ -533,3 +533,88 @@ func lengthOfLongestSubstring(s string) int {
 	}
 	return res
 }
+
+func myPow(x float64, n int) float64 {
+	var quickMul func(x float64, n int) float64
+	//n=5,2,1,0
+	quickMul = func(x float64, n int) float64 {
+		if n == 0 {
+			return 1
+		}
+		y := quickMul(x, n/2)
+		if n%2 == 0 {
+			return y * y
+		}
+		return y * y * x
+	}
+	if n >= 0 {
+		return quickMul(x, n)
+	}
+	return 1.0 / quickMul(x, -n)
+}
+
+func maximalSquare(matrix [][]byte) int {
+	m, n := len(matrix), len(matrix[0])
+	f := make([][]int, m+1)
+	for i := 0; i < len(f); i++ {
+		f[i] = make([]int, n+1)
+	}
+	var res int
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			if matrix[i][j] == '1' {
+				f[i+1][j+1] = min(f[i][j+1], f[i+1][j], f[i][j]) + 1
+				res = max(res, f[i+1][j+1])
+			}
+		}
+	}
+	return res * res
+}
+
+func minDistance(word1 string, word2 string) int {
+	m, n := len(word1), len(word2)
+	f := make([][]int, m+1)
+	for i := 0; i < len(f); i++ {
+		f[i] = make([]int, n+1)
+	}
+	for i := 0; i < m+1; i++ {
+		f[i][0] = i
+	}
+	for j := 0; j < n+1; j++ {
+		f[0][j] = j
+	}
+	for i := 0; i < m+1; i++ {
+		for j := 0; j < n+1; j++ {
+			if word1[i] == word2[j] {
+				f[i+1][j+1] = f[i][j]
+			} else {
+				f[i+1][j+1] = min(f[i+1][j], f[i][j+1], f[i][j]) + 1
+			}
+		}
+	}
+	return f[m][n]
+}
+
+func isInterleave(s1 string, s2 string, s3 string) bool {
+	m, n, t := len(s1), len(s2), len(s3)
+	if m+n != t {
+		return false
+	}
+	f := make([][]bool, m+1)
+	for i := 0; i < len(f); i++ {
+		f[i] = make([]bool, n+1)
+	}
+	f[0][0] = true
+	for i := 0; i < m+1; i++ {
+		for j := 0; j < n+1; j++ {
+			p := i + j - 1
+			if i > 0 {
+				f[i][j] = f[i][j] || (f[i-1][j] && s1[i-1] == s3[p])
+			}
+			if j > 0 {
+				f[i][j] = f[i][j] || (f[i][j-1] && s2[j-1] == s3[p])
+			}
+		}
+	}
+	return f[m][n]
+}

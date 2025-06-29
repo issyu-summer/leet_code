@@ -5,32 +5,22 @@ func main() {
 }
 
 type LRUCache struct {
-	n int
-	L *Node
-	R *Node
-	m map[int]*Node
+	n     int
+	L, R  *Node
+	cache map[int]*Node
 }
 
 type Node struct {
-	key   int
-	val   int
-	left  *Node
-	right *Node
-}
-
-func initNode(k, v int) *Node {
-	return &Node{
-		key: k,
-		val: v,
-	}
+	key, val    int
+	left, right *Node
 }
 
 func Constructor(capacity int) LRUCache {
 	lru := LRUCache{
-		n: capacity,
-		L: &Node{},
-		R: &Node{},
-		m: map[int]*Node{},
+		n:     capacity,
+		L:     &Node{},
+		R:     &Node{},
+		cache: map[int]*Node{},
 	}
 	lru.L.right = lru.R
 	lru.R.left = lru.L
@@ -38,51 +28,41 @@ func Constructor(capacity int) LRUCache {
 }
 
 func (this *LRUCache) Get(key int) int {
-	p, ok := this.m[key]
-	if !ok {
-		return -1
+	if node, ok := this.cache[key]; ok {
+		this.remove(node)
+		this.insertToHead(node)
+		return node.val
 	}
-
-	this.remove(p)
-	this.insert(p)
-	return p.val
+	return -1
 }
 
-func (this *LRUCache) Put(key int, value int) {
-	p, ok := this.m[key]
-	if ok {
-		p.val = value
-		this.remove(p)
-		this.insert(p)
+func (this *LRUCache) Put(key, val int) {
+	if node, ok := this.cache[key]; ok {
+		node.val = val
+		this.remove(node)
+		this.insertToHead(node)
 		return
 	}
-
-	if len(this.m) == this.n {
-		q := this.R.left
-		this.remove(q)
-		delete(this.m, q.key)
-		// delete(q)
+	if len(this.cache) >= this.n {
+		tail := this.R.left
+		this.remove(tail)
+		delete(this.cache, tail.key)
 	}
-	node := initNode(key, value)
-	this.m[key] = node
-	this.insert(node)
+	node := &Node{key: key, val: val}
+	this.cache[key] = node
+	this.insertToHead(node)
 }
 
-func (this *LRUCache) remove(p *Node) {
-	p.right.left = p.left
-	p.left.right = p.right
+func (this *LRUCache) remove(node *Node) {
+	first, _, third := node.left, node, node.right
+	first.right = third
+	third.left = first
 }
 
-func (this *LRUCache) insert(p *Node) {
-	p.right = this.L.right
-	p.left = this.L
-	this.L.right.left = p
-	this.L.right = p
+func (this *LRUCache) insertToHead(node *Node) {
+	first, second, third := this.L, node, this.L.right
+	first.right = second
+	second.left = first
+	second.right = third
+	third.left = second
 }
-
-/**
- * Your LRUCache object will be instantiated and called as such:
- * obj := Constructor(capacity);
- * param_1 := obj.Get(key);
- * obj.Put(key,value);
- */
