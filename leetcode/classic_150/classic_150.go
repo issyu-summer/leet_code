@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"slices"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -617,4 +618,378 @@ func isInterleave(s1 string, s2 string, s3 string) bool {
 		}
 	}
 	return f[m][n]
+}
+
+// 逆波兰表达式
+func evalRPN(tokens []string) int {
+	var stack []int
+	for i := 0; i < len(tokens); i++ {
+		val, err := strconv.Atoi(tokens[i])
+		if err == nil {
+			stack = append(stack, val)
+		} else {
+			num1, num2 := stack[len(stack)-2], stack[len(stack)-1]
+			stack = stack[:len(stack)-2]
+			switch tokens[i] {
+			case "+":
+				stack = append(stack, num1+num2)
+			case "-":
+				stack = append(stack, num1-num2)
+			case "*":
+				stack = append(stack, num1*num2)
+			case "/":
+				stack = append(stack, num1/num2)
+			}
+		}
+	}
+	return stack[0]
+}
+
+func longestPalindrome(s string) string {
+	expand := func(str string, i, j int) (int, int) {
+		l, r := i, j
+		for l >= 0 && r <= len(str)-1 && str[l] == str[r] {
+			l--
+			r++
+		}
+		return l + 1, r - 1
+	}
+	var res string
+	for i := 0; i < len(s); i++ {
+		l1, r1 := expand(s, i, i)
+		if len(res) < r1-l1+1 {
+			res = s[l1 : r1+1]
+		}
+		l2, r2 := expand(s, i, i+1)
+		if len(res) < r2-l2+1 {
+			res = s[l2 : r2+1]
+		}
+	}
+	return res
+}
+
+func uniquePathsWithObstacles(obstacleGrid [][]int) int {
+	m, n := len(obstacleGrid), len(obstacleGrid[0])
+	f := make([][]int, m)
+	for i := 0; i < len(f); i++ {
+		f[i] = make([]int, n)
+	}
+	for i := 0; i < m && obstacleGrid[i][0] == 0; i++ {
+		f[i][0] = 1
+	}
+	for j := 0; j < n && obstacleGrid[0][j] == 0; j++ {
+		f[0][j] = 1
+	}
+	for i := 1; i < m; i++ {
+		for j := 1; j < n; j++ {
+			if obstacleGrid[i][j] == 0 {
+				f[i][j] = f[i-1][j] + f[i][j-1]
+			}
+		}
+	}
+	return f[m-1][n-1]
+}
+
+func minPathSum(grid [][]int) int {
+	m, n := len(grid), len(grid[0])
+	f := make([][]int, m)
+	for i := 0; i < len(f); i++ {
+		f[i] = make([]int, n)
+	}
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			if i == 0 && j == 0 {
+				f[i][j] = grid[i][j]
+			} else if i == 0 {
+				f[i][j] = f[i][j-1] + grid[i][j]
+			} else if j == 0 {
+				f[i][j] = f[i-1][j] + grid[i][j]
+			} else {
+				f[i][j] = min(f[i-1][j], f[i][j-1]) + grid[i][j]
+			}
+		}
+	}
+	return f[m-1][n-1]
+}
+
+func minimumTotal(triangle [][]int) int {
+	for i := len(triangle) - 2; i >= 0; i-- {
+		for j := 0; j <= i; j++ {
+			triangle[i][j] += min(triangle[i+1][j], triangle[i+1][j+1])
+		}
+	}
+	return triangle[0][0]
+}
+
+func isPalindromeNumber(x int) bool {
+	if x < 0 {
+		return false
+	}
+	p, q := x, 0
+	for p > 0 {
+		q = q*10 + p%10
+		p /= 10
+	}
+	return x == q
+}
+
+func plusOne(digits []int) []int {
+	for i := len(digits) - 1; i >= 0; i-- {
+		digits[i]++
+		digits[i] %= 10
+		if digits[i] != 0 {
+			return digits
+		}
+	}
+	digits = append([]int{1}, digits...)
+	return digits
+}
+
+func trailingZeroes(n int) int {
+	var res int
+	pow := 5
+	for n/pow > 0 {
+		res += n / pow
+		pow *= 5
+	}
+	return res
+}
+
+// 数字二进制的公共前缀
+func rangeBitwiseAnd(l int, r int) int {
+	var shift int
+	for l != r {
+		l, r = l>>1, r>>1
+		shift++
+	}
+	return r << shift
+}
+
+func singleNumber(nums []int) int {
+	var res int
+	for i := 0; i < len(nums); i++ {
+		res ^= nums[i]
+	}
+	return res
+}
+
+func singleNumberII(nums []int) int {
+	once, twice := 0, 0
+	for i := 0; i < len(nums); i++ {
+		once = (once ^ nums[i]) &^ twice
+		twice = (twice ^ nums[i]) &^ once
+	}
+	return once
+}
+
+func hammingWeight(n int) int {
+	var res int
+	for n != 0 {
+		res++
+		n &= n - 1
+	}
+	return res
+}
+
+func reverseBits(n uint32) uint32 {
+	var res uint32
+	for i := 0; i < 32 && n > 0; i++ {
+		res |= n & 1 << (31 - i)
+		n >>= 1
+	}
+	return res
+}
+
+func addBinary(a string, b string) string {
+	toVal := func(c byte) int {
+		if c >= '0' && c <= '9' {
+			return int(c - '0')
+		}
+		return int(c - 'A' + 10)
+	}
+	toChar := func(n int) byte {
+		if n < 10 {
+			return byte('0' + n)
+		}
+		return byte('A' + n - 10)
+	}
+	add := func(a string, b string, numeration int) string {
+		var res []byte
+		var carry int
+		i, j := len(a)-1, len(b)-1
+		for i >= 0 || j >= 0 {
+			sum := carry
+			if i >= 0 {
+				sum += toVal(a[i])
+				i--
+			}
+			if j >= 0 {
+				sum += toVal(b[j])
+				j--
+			}
+			carry = sum / numeration
+			sum %= numeration
+			res = append([]byte{toChar(sum)}, res...)
+		}
+		if carry > 0 {
+			res = append([]byte{toChar(carry)}, res...)
+		}
+		return string(res)
+	}
+	return add(a, b, 2)
+}
+
+type minHeap struct {
+	nums []int
+}
+
+func (h *minHeap) up(i int) {
+	parent, smallest := (i-1)/2, i
+	//注意这里是小于等于
+	if parent < 0 || h.nums[parent] <= h.nums[smallest] {
+		return
+	}
+	h.nums[parent], h.nums[smallest] = h.nums[smallest], h.nums[parent]
+	h.up(parent)
+}
+
+// append to tail->child want to up
+func (h *minHeap) push(val int) {
+	h.nums = append(h.nums, val)
+	h.up(len(h.nums) - 1)
+}
+
+func (h *minHeap) down(i int) {
+	l, r, smallest := 2*i+1, 2*i+2, i
+	if l < len(h.nums) && h.nums[l] < h.nums[smallest] {
+		smallest = l
+	}
+	if r < len(h.nums) && h.nums[r] < h.nums[smallest] {
+		smallest = r
+	}
+	if smallest == i {
+		return
+	}
+	h.nums[smallest], h.nums[i] = h.nums[i], h.nums[smallest]
+	h.down(smallest)
+}
+
+// swap head,tail->pop tail->parent want to down
+func (h *minHeap) pop() (int, bool) {
+	if len(h.nums) == 0 {
+		return -1, false
+	}
+	n := len(h.nums)
+	h.nums[0], h.nums[n-1] = h.nums[n-1], h.nums[0]
+	val := h.nums[len(h.nums)-1]
+	h.nums = h.nums[:len(h.nums)-1]
+	h.down(0)
+	return val, true
+}
+
+func (h *minHeap) peek() int {
+	if len(h.nums) == 0 {
+		return 0
+	}
+	return h.nums[0]
+}
+
+func (h *minHeap) len() int {
+	return len(h.nums)
+}
+
+func findKthLargest(nums []int, k int) int {
+	h := &minHeap{nums: []int{}}
+	for i := 0; i < len(nums); i++ {
+		if h.len() < k {
+			h.push(nums[i])
+		} else if h.peek() < nums[i] {
+			h.pop()
+			h.push(nums[i])
+		}
+	}
+	return h.nums[0]
+}
+
+type elem struct {
+	a, b int
+	x, y int
+}
+type minElemHeap struct {
+	nums []elem
+}
+
+func (h *minElemHeap) val(i int) int {
+	return h.nums[i].a + h.nums[i].b
+}
+
+func (h *minElemHeap) up(i int) {
+	parent, smallest := (i-1)/2, i
+	if parent < 0 || h.val(parent) <= h.val(smallest) {
+		return
+	}
+	h.nums[parent], h.nums[smallest] = h.nums[smallest], h.nums[parent]
+	h.up(parent)
+}
+
+// append to tail->child want to up
+func (h *minElemHeap) push(elem elem) {
+	h.nums = append(h.nums, elem)
+	h.up(len(h.nums) - 1)
+}
+
+func (h *minElemHeap) down(i int) {
+	l, r, smallest := 2*i+1, 2*i+2, i
+	if l < len(h.nums) && h.val(l) < h.val(smallest) {
+		smallest = l
+	}
+	if r < len(h.nums) && h.val(r) < h.val(smallest) {
+		smallest = r
+	}
+	if smallest == i {
+		return
+	}
+	h.nums[smallest], h.nums[i] = h.nums[i], h.nums[smallest]
+	h.down(smallest)
+}
+
+// swap head,tail->pop tail->parent want to down
+func (h *minElemHeap) pop() (elem, bool) {
+	if len(h.nums) == 0 {
+		return elem{}, false
+	}
+	n := len(h.nums)
+	h.nums[0], h.nums[n-1] = h.nums[n-1], h.nums[0]
+	val := h.nums[len(h.nums)-1]
+	h.nums = h.nums[:len(h.nums)-1]
+	h.down(0)
+	return val, true
+}
+
+func (h *minElemHeap) peek() int {
+	if len(h.nums) == 0 {
+		return 0
+	}
+	return h.val(0)
+}
+
+func (h *minElemHeap) len() int {
+	return len(h.nums)
+}
+
+func kSmallestPairs(nums1 []int, nums2 []int, k int) [][]int {
+	h := &minElemHeap{nums: []elem{}}
+	for i := 0; i < len(nums1) && h.len() <= k; i++ {
+		h.push(elem{nums1[i], nums2[0], i, 0})
+	}
+	var res [][]int
+	for h.len() > 0 && len(res) < k {
+		val, _ := h.pop()
+		res = append(res, []int{val.a, val.b})
+		x, y := val.x, val.y
+		if y+1 < len(nums2) {
+			h.push(elem{nums1[x], nums2[y+1], x, y + 1})
+		}
+	}
+	return res
 }

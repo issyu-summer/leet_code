@@ -1,5 +1,10 @@
 package main
 
+import (
+	"fmt"
+	"math/rand/v2"
+)
+
 func main() {
 
 }
@@ -213,4 +218,198 @@ func flatten(root *TreeNode) {
 		}
 		cur = cur.Right
 	}
+}
+
+// 图DFS
+func canFinish(numCourses int, prerequisites [][]int) bool {
+	graph := map[int][]int{}
+	for _, p := range prerequisites {
+		//学习p0，必须先学习p1
+		from, to := p[0], p[1]
+		graph[from] = append(graph[from], to)
+	}
+	visited := map[int]int{}
+	var hasCycle func(course int) bool
+	hasCycle = func(course int) bool {
+		if visited[course] == 1 {
+			return true
+		}
+		if visited[course] == 2 {
+			return false
+		}
+		visited[course] = 1
+		//dfs
+		for _, nxt := range graph[course] {
+			if hasCycle(nxt) {
+				return true
+			}
+		}
+		visited[course] = 2
+		return false
+	}
+	for i := 0; i < numCourses; i++ {
+		if hasCycle(i) {
+			return false
+		}
+	}
+	return true
+}
+
+// 图BFS
+func orangesRotting(grid [][]int) int {
+	m, n := len(grid), len(grid[0])
+	type point struct{ x, y int }
+	var q []point
+	var fresh int
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			if grid[i][j] == 2 {
+				q = append(q, point{i, j})
+			} else if grid[i][j] == 1 {
+				fresh++
+			}
+		}
+	}
+	var res int
+	directions := [][]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
+	for len(q) > 0 && fresh > 0 {
+		levelSize := len(q)
+		for i := 0; i < levelSize; i++ {
+			cur := q[0]
+			q = q[1:]
+			for _, d := range directions {
+				//nxt point
+				ni := cur.x + d[0]
+				nj := cur.y + d[1]
+				if ni < 0 || ni > m-1 || nj < 0 || nj > n-1 || grid[ni][nj] != 1 {
+					continue
+				}
+				grid[ni][nj] = 2
+				fresh--
+				q = append(q, point{ni, nj})
+			}
+		}
+		res++
+	}
+	if fresh > 0 {
+		return -1
+	}
+	return res
+}
+
+// top-k quick select优化
+func findKthLargest(nums []int, k int) int {
+	partition := func(nums []int, l, r int) int {
+		random := l + rand.IntN(r-l+1)
+		nums[r], nums[random] = nums[random], nums[r]
+		pivot := nums[r]
+		i := l
+		for j := l; j < r; j++ {
+			if nums[j] < pivot {
+				nums[i], nums[j] = nums[j], nums[i]
+				i++
+			}
+		}
+		nums[i], nums[r] = nums[r], nums[i]
+		return i
+	}
+	var quickSelect func(nums []int, l, r int, topK int)
+	quickSelect = func(nums []int, l, r int, topK int) {
+		pivotIdx := partition(nums, l, r)
+		if pivotIdx == topK {
+			return
+		} else if pivotIdx < topK {
+			quickSelect(nums, pivotIdx+1, r, topK)
+		} else {
+			quickSelect(nums, l, pivotIdx-1, topK)
+		}
+	}
+	quickSelect(nums, 0, len(nums)-1, len(nums)-k)
+	return nums[len(nums)-k:][0]
+}
+
+// top-k heap优化
+type minHeap struct {
+	nums []int
+}
+
+func (h *minHeap) len() int {
+	return len(h.nums)
+}
+
+func (h *minHeap) siftUp(i int) {
+	parent := (i - 1) / 2
+	if parent < 0 || h.nums[parent] <= h.nums[i] {
+		return
+	}
+	h.nums[i], h.nums[parent] = h.nums[parent], h.nums[i]
+	h.siftUp(parent)
+}
+
+// append->children want to up
+func (h *minHeap) push(val int) {
+	h.nums = append(h.nums, val)
+	h.siftUp(len(h.nums) - 1)
+}
+
+func (h *minHeap) siftDown(i int) {
+	l, r, smallest := 2*i+1, 2*i+2, i
+	if l < len(h.nums) && h.nums[l] <= h.nums[smallest] {
+		smallest = l
+	}
+	if r < len(h.nums) && h.nums[r] <= h.nums[smallest] {
+		smallest = r
+	}
+	if smallest == i {
+		return
+	}
+	h.nums[i], h.nums[smallest] = h.nums[smallest], h.nums[i]
+	h.siftDown(smallest)
+}
+
+// swap to top,top wants to down
+func (h *minHeap) pop() (int, bool) {
+	if len(h.nums) == 0 {
+		return -1, false
+	}
+	val := h.nums[0]
+	h.nums[0], h.nums[len(h.nums)-1] = h.nums[len(h.nums)-1], h.nums[0]
+	h.nums = h.nums[:len(h.nums)-1]
+	h.siftDown(0)
+	return val, true
+}
+
+func (h *minHeap) peek() int {
+	return h.nums[0]
+}
+
+func findKthLargestHeap(nums []int, k int) int {
+	h := &minHeap{}
+	for i := 0; i < len(nums); i++ {
+		if h.len() < k {
+			h.push(nums[i])
+		} else if h.nums[i] > h.peek() {
+			h.pop()
+			h.push(nums[i])
+		}
+		fmt.Println(h.peek())
+	}
+	return h.nums[0]
+}
+
+func partitionLabels(s string) []int {
+	lastPos := map[byte]int{}
+	for i := 0; i < len(s); i++ {
+		lastPos[s[i]] = i
+	}
+	var res []int
+	var start, end int
+	for i := 0; i < len(s); i++ {
+		end = max(end, lastPos[s[i]])
+		if i == end {
+			res = append(res, end-start+1)
+			start = end + 1
+		}
+	}
+	return res
 }
